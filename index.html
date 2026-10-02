@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 智慧護理臨床決策輔助系統 | Smart Nursing CDSS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --berry-pink: #ff85a2;
+            --berry-bright: #ff477e;
+            --berry-soft: #ffe6ed;
+            --cream-bg: #fff5f8;
+            --custard-yellow: #fff8d6;
+            --mint-green: #e2f9e5;
+            --lavender-soft: #f3e8ff;
+            --text-cookie: #5c3e35;
+            --text-soft: #8d6e63;
+            --border-candy: #ffb6c1;
+            --radius-bubble: 28px;
+            --shadow-pop: 0 12px 28px rgba(255, 118, 151, 0.2);
+            --shadow-hover: 0 16px 32px rgba(255, 71, 126, 0.28);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--cream-bg);
+            background-image: 
+                radial-gradient(#ffccd5 1.5px, transparent 1.5px),
+                radial-gradient(#ffccd5 1.5px, var(--cream-bg) 1.5px);
+            background-size: 28px 28px;
+            background-position: 0 0, 14px 14px;
+            color: var(--text-cookie);
+            margin: 0;
+            padding: 24px 16px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            display: grid;
+            grid-template-columns: 1.15fr 1.25fr;
+            gap: 24px;
+        }
+
+        /* 卡片容器 */
+        .panel {
+            background: rgba(255, 255, 255, 0.98);
+            border: 3px solid var(--border-candy);
+            border-radius: var(--radius-bubble);
+            padding: 28px;
+            box-shadow: var(--shadow-pop);
+            position: relative;
+        }
+
+        /* 標頭樣式 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 18px;
+            border-bottom: 3px dashed var(--border-candy);
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #ff9ebb, #ff477e);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 26px;
+            box-shadow: 0 8px 18px rgba(255, 71, 126, 0.35);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-4deg); }
+            50% { transform: translateY(-6px) rotate(4deg); }
+        }
+
+        .header-title-group h1 {
+            font-size: 22px;
+            color: var(--text-cookie);
+            margin: 0;
+            font-weight: 900;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: var(--text-soft);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .version-badge {
+            background: #fff0f3;
+            color: var(--berry-bright);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 900;
+            border: 2px solid var(--border-candy);
+            box-shadow: 0 4px 10px rgba(255, 133, 162, 0.2);
+        }
+
+        /* 病患資訊與生命徵象區塊 */
+        .patient-info-card {
+            background: #fff9fa;
+            border: 2.5px solid #ffe3eb;
+            border-radius: 22px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .patient-info-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--berry-bright);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .patient-input-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-group label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-soft);
+        }
+
+        .cute-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .cute-input-wrap i {
+            position: absolute;
+            left: 10px;
+            color: var(--berry-pink);
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .cute-input {
+            width: 100%;
+            padding: 8px 10px 8px 30px;
+            border: 2px solid #ffe3eb;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-cookie);
+            background: white;
+            outline: none;
+        }
+
+        .cute-select {
+            appearance: none;
+            cursor: pointer;
+            padding-right: 20px;
+        }
+
+        .cute-input:focus {
+            border-color: var(--berry-pink);
+            box-shadow: 0 0 0 3px rgba(255, 133, 162, 0.2);
+        }
+
+        /* 症狀列表 */
+        .symptom-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .symptom-item {
+            background: #ffffff;
+            border: 2.5px solid #ffe3eb;
+            border-radius: 20px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .symptom-item:hover {
+            border-color: var(--berry-pink);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px) scale(1.01);
+        }
+
+        .symptom-icon-box {
+            width: 44px;
+            height: 44px;
+            background: #fff0f4;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--berry-bright);
+            flex-shrink: 0;
+        }
+
+        .symptom-info { flex-grow: 1; }
+
+        .symptom-info h3 {
+            margin: 0 0 2px 0;
+            font-size: 15px;
+            color: var(--text-cookie);
+            font-weight: 900;
+        }
+
+        .symptom-info p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--text-soft);
+        }
+
+        /* 草莓切換開關 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e8d7dd;
+            transition: .35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 30px;
+            border: 2px solid #dfcad1;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "🍓";
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 22px;
+            width: 22px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        input:checked + .slider {
+            background-color: var(--berry-pink);
+            border-color: var(--berry-bright);
+        }
+
+        input:checked + .slider:before {
+            content: "💖";
+            transform: translateX(26px) rotate(360deg);
+        }
+
+        /* 按鈕組 */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 3px dashed var(--border-candy);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 18px;
+            border: none;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .btn:active { transform: scale(0.95); }
+
+        .btn-reset {
+            background: var(--lavender-soft);
+            color: #7e22ce;
+            border: 2px solid #e9d5ff;
+        }
+
+        .btn-reset:hover {
+            background: #e9d5ff;
+            transform: translateY(-2px);
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #ff85a2, #ff477e);
+            color: white;
+            margin-left: auto;
+            box-shadow: 0 6px 18px rgba(255, 71, 126, 0.35);
+        }
+
+        .btn-copy:hover {
+            box-shadow: 0 8px 24px rgba(255, 71, 126, 0.45);
+            transform: translateY(-2px);
+        }
+
+        /* 右側區域 */
+        .panel-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 診斷輸出卡片 */
+        .output-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 3px solid var(--border-candy);
+            border-radius: var(--radius-bubble);
+            padding: 24px;
+            box-shadow: var(--shadow-pop);
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-soft);
+        }
+
+        .empty-icon-wrap {
+            font-size: 46px;
+            color: var(--berry-pink);
+            margin-bottom: 8px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+            60% { transform: translateY(-4px); }
+        }
+
+        .empty-state h3 {
+            margin: 0 0 4px 0;
+            font-size: 17px;
+            color: var(--text-cookie);
+            font-weight: 900;
+        }
+
+        .empty-state p { margin: 0; font-size: 13px; }
+
+        /* 診斷結果 */
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 3px dashed var(--border-candy);
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+        }
+
+        .result-tag {
+            font-size: 12px;
+            color: var(--berry-bright);
+            background: #fff0f4;
+            padding: 4px 12px;
+            border-radius: 14px;
+            font-weight: 900;
+            display: inline-block;
+            margin-bottom: 6px;
+            border: 1.5px solid var(--border-candy);
+        }
+
+        .result-title {
+            font-size: 24px;
+            margin: 0;
+            color: var(--text-cookie);
+            font-weight: 900;
+        }
+
+        .urgency-badge {
+            padding: 8px 16px;
+            border-radius: 18px;
+            font-size: 13px;
+            font-weight: 900;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .urgency-low { background: var(--mint-green); color: #1b4332; border: 2px solid #b7e4c7; }
+        .urgency-med { background: var(--custard-yellow); color: #7f4f24; border: 2px solid #ffe066; }
+        .urgency-high { background: #ffccd5; color: #a4133c; border: 2px solid #ff8fa3; }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .detail-box {
+            background: #fff9fa;
+            border: 2px solid var(--border-candy);
+            border-radius: 20px;
+            padding: 14px;
+        }
+
+        .detail-box h4 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            color: var(--berry-bright);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 900;
+        }
+
+        .detail-box ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--text-cookie);
+            font-weight: 500;
+        }
+
+        /* 決策樹圖表 */
+        .tree-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 3px solid var(--border-candy);
+            border-radius: var(--radius-bubble);
+            padding: 20px;
+            box-shadow: var(--shadow-pop);
+        }
+
+        .tree-card h3 {
+            margin: 0 0 14px 0;
+            font-size: 15px;
+            color: var(--text-cookie);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 900;
+        }
+
+        .tree-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tree-node {
+            background: #ffffff;
+            border: 2px solid var(--border-candy);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--text-cookie);
+        }
+
+        .tree-node.active {
+            background: var(--berry-pink);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 6px 16px rgba(255, 133, 162, 0.45);
+        }
+
+        .tree-branches {
+            display: flex;
+            gap: 14px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .tree-leaf {
+            flex: 1;
+            max-width: 170px;
+            background: #fff9fa;
+            border: 2px solid #ffe3eb;
+            border-radius: 16px;
+            padding: 8px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-cookie);
+        }
+
+        .tree-leaf.active {
+            background: #fff0f4;
+            border-color: var(--berry-bright);
+            color: var(--berry-bright);
+            font-weight: 900;
+            box-shadow: 0 4px 12px rgba(255, 71, 126, 0.25);
+        }
+
+        /* SBAR 卡片 */
+        .sbar-card {
+            background: #fffdf9;
+            border: 3px solid var(--border-candy);
+            border-radius: var(--radius-bubble);
+            padding: 20px;
+            box-shadow: var(--shadow-pop);
+        }
+
+        .sbar-title {
+            font-size: 14px;
+            font-weight: 900;
+            color: var(--berry-bright);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sbar-box {
+            background: white;
+            border: 2px dashed var(--border-candy);
+            border-radius: 18px;
+            padding: 14px;
+            font-size: 12px;
+            line-height: 1.7;
+            color: var(--text-cookie);
+            white-space: pre-wrap;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        @media (max-width: 960px) {
+            .container { grid-template-columns: 1fr; }
+            .patient-input-grid { grid-template-columns: 1fr 1fr; }
+            .details-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 左側：病患資訊與症狀輸入面板 -->
+        <div class="panel">
+            <div class="header">
+                <div class="header-title-group">
+                    <div class="header-icon">
+                        <i class="fas fa-heart-pulse"></i>
+                    </div>
+                    <div>
+                        <h1>智慧護理臨床決策輔助系統</h1>
+                        <div class="header-subtitle">🌸 Smart Nursing CDSS • C4.5 決策模型</div>
+                    </div>
+                </div>
+                <div class="version-badge">✨ Clinical CDSS</div>
+            </div>
+
+            <!-- 病患基本資訊與生命徵象區塊 -->
+            <div class="patient-info-card">
+                <div class="patient-info-title">
+                    <i class="fas fa-id-card-clip"></i> 病患資訊與生命徵象 (Vitals)
+                </div>
+                <div class="patient-input-grid">
+                    <!-- 病歷號碼 -->
+                    <div class="input-group">
+                        <label>病歷號碼</label>
+                        <div class="cute-input-wrap">
+                            <i class="fas fa-hashtag"></i>
+                            <input type="text" id="mrn" class="cute-input" placeholder="例：882019" oninput="runInference()">
+                        </div>
+                    </div>
+
+                    <!-- 姓名 -->
+                    <div class="input-group">
+                        <label>姓名</label>
+                        <div class="cute-input-wrap">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="patientName" class="cute-input" placeholder="例：陳美麗" oninput="runInference()">
+                        </div>
+                    </div>
+
+                    <!-- 性別 -->
+                    <div class="input-group">
+                        <label>性別</label>
+                        <div class="cute-input-wrap">
+                            <i class="fas fa-venus-mars"></i>
+                            <select id="gender" class="cute-input cute-select" onchange="runInference()">
+                                <option value="女 (Female)">女 (Female)</option>
+                                <option value="男 (Male)">男 (Male)</option>
+                                <option value="其他 (Other)">其他 (Other)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 年齡 -->
+                    <div class="input-group">
+                        <label>年齡</label>
+                        <div class="cute-input-wrap">
+                            <i class="fas fa-cake-candles"></i>
+                            <input type="number" id="age" class="cute-input" placeholder="例：32" oninput="runInference()">
+                        </div>
+                    </div>
+
+                    <!-- 耳溫 (°C) -->
+                    <div class="input-group">
+                        <label>耳溫 (°C)</label>
+                        <div class="cute-input-wrap">
+                            <i class="fas fa-thermometer-half"></i>
+                            <input type="number" step="0.1" id="temp" class="cute-input" placeholder="例：38.2" oninput="onTempInput()">
+                        </div>
+                    </div>
+
+                    <!-- 血壓 (mmHg) -->
+                    <div class="input-group">
+                        <label>血壓 (mmHg)</label>
+                        <div class="cute-input-wrap">
+                            <i class="fas fa-heart-pulse"></i>
+                            <input type="text" id="bp" class="cute-input" placeholder="例：120/80" oninput="runInference()">
+                        </div>
+                    </div>
+
+                    <!-- 床號 / 病房 -->
+                    <div class="input-group">
+                        <label>床號 / 病房</label>
+                        <div class="cute-input-wrap">
+                            <i class="fas fa-bed"></i>
+                            <input type="text" id="bedNo" class="cute-input" placeholder="例：502-B" oninput="runInference()">
+                        </div>
+                    </div>
+
+                    <!-- 評估人員 -->
+                    <div class="input-group" style="grid-column: span 2;">
+                        <label>評估人員 (Nurse ID)</label>
+                        <div class="cute-input-wrap">
+                            <i class="fas fa-user-nurse"></i>
+                            <input type="text" id="nurseId" class="cute-input" placeholder="例：張護理師 (N102)" oninput="runInference()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 12px; font-weight: 700;">
+                點擊開關切換臨床評估症狀：
+            </p>
+
+            <div class="symptom-list">
+                <!-- Sore Throat -->
+                <div class="symptom-item">
+                    <div class="symptom-icon-box">
+                        <i class="fas fa-head-side-cough"></i>
+                    </div>
+                    <div class="symptom-info">
+                        <h3>喉嚨痛</h3>
+                        <p>咽喉刺痛或吞嚥不舒服</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="soreThroat" onchange="runInference()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Fever -->
+                <div class="symptom-item">
+                    <div class="symptom-icon-box">
+                        <i class="fas fa-temperature-high"></i>
+                    </div>
+                    <div class="symptom-info">
+                        <h3>發燒</h3>
+                        <p>耳溫 ≥ 37.5°C 或自述發熱畏寒</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="fever" onchange="runInference()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Lymph Nodes -->
+                <div class="symptom-item">
+                    <div class="symptom-icon-box">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <div class="symptom-info">
+                        <h3>淋巴腺腫脹</h3>
+                        <p>頸部淋巴結有壓痛或腫大</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="lymphNodes" onchange="runInference()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Congestion -->
+                <div class="symptom-item">
+                    <div class="symptom-icon-box">
+                        <i class="fas fa-hand-holding-medical"></i>
+                    </div>
+                    <div class="symptom-info">
+                        <h3>充血</h3>
+                        <p>咽喉黏膜紅腫充血或鼻塞</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="congestion" onchange="runInference()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Headache -->
+                <div class="symptom-item">
+                    <div class="symptom-icon-box">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="symptom-info">
+                        <h3>頭痛</h3>
+                        <p>病患自述頭部緊繃或鈍痛</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="headache" onchange="runInference()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-reset" onclick="resetForm()"><i class="fas fa-rotate-left"></i> 重置條件</button>
+                <button class="btn btn-copy" onclick="copySBAR()"><i class="far fa-copy"></i> 複製 SBAR 報告</button>
+            </div>
+        </div>
+
+        <!-- 右側：推論與結果顯示區域 -->
+        <div class="panel-right">
+            
+            <!-- 診斷結果區 -->
+            <div class="output-card">
+                
+                <!-- 尚未選擇症狀狀態 -->
+                <div id="emptyState" class="empty-state">
+                    <div class="empty-icon-wrap">
+                        <i class="fas fa-notes-medical"></i>
+                    </div>
+                    <h3>尚未選擇臨床症狀 🌸</h3>
+                    <p>請勾選左側臨床症狀～<br>系統將即時根據 C4.5 分類規則算出現階段護理建議！</p>
+                </div>
+
+                <!-- 診斷內容 -->
+                <div id="resultContent" style="display: none;">
+                    <div class="result-header">
+                        <div>
+                            <span class="result-tag">✨ C4.5 模型診斷結果</span>
+                            <h2 class="result-title" id="diagResult">--</h2>
+                        </div>
+                        <div id="urgencyBadge" class="urgency-badge urgency-low">臨床觀察</div>
+                    </div>
+
+                    <div class="details-grid">
+                        <div class="detail-box">
+                            <h4><i class="fas fa-user-nurse"></i> 護理照護重點</h4>
+                            <ul id="careList"></ul>
+                        </div>
+                        <div class="detail-box">
+                            <h4><i class="fas fa-triangle-exclamation"></i> 警示徵候 (Red Flags)</h4>
+                            <ul id="flagList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- C4.5 決策樹圖表 -->
+            <div class="tree-card">
+                <h3><i class="fas fa-sitemap"></i> C4.5 決策推理路徑</h3>
+                <div class="tree-flow">
+                    <div class="tree-node" id="nodeRoot">根節點：淋巴腺腫脹？</div>
+                    <div class="tree-branches">
+                        <div class="tree-leaf" id="leafStrep">
+                            <strong>是 (Yes)</strong>
+                            <div style="margin-top: 4px;">鏈球菌性喉炎</div>
+                        </div>
+                        <div class="tree-leaf" id="leafLymphNo">
+                            <strong>否 (No)</strong>
+                            <div style="margin-top: 4px;">評估「發燒」...</div>
+                        </div>
+                    </div>
+
+                    <div class="tree-branches" style="margin-top: 6px;">
+                        <div class="tree-leaf" id="leafCold">
+                            <strong>發燒 = 是</strong>
+                            <div style="margin-top: 4px;">感冒</div>
+                        </div>
+                        <div class="tree-leaf" id="leafAllergy">
+                            <strong>發燒 = 否</strong>
+                            <div style="margin-top: 4px;">過敏</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SBAR 報告生成器 -->
+            <div class="sbar-card">
+                <div class="sbar-title"><i class="fas fa-scroll"></i> SBAR 護理交接班報告</div>
+                <div class="sbar-box" id="sbarOutput">-- 請勾選症狀以生成 SBAR 交接報告 --</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const CLINICAL_KNOWLEDGE = {
+            "鏈球菌性喉炎": {
+                urgency: "med",
+                urgencyText: "需開立處方 💊",
+                care: [
+                    "使用溫鹽水漱口減緩咽喉不適",
+                    "鼓勵補充水分（每日 2000c.c. 以上）",
+                    "遵醫囑給予抗生素及解熱鎮痛藥物",
+                    "衛教衛生習慣，預防飛沫與接觸傳播"
+                ],
+                flags: [
+                    "吞嚥困難伴隨大量流涎",
+                    "呼吸急促、喘鳴聲或呼吸困難",
+                    "體溫 > 39.0°C 且無顯著改善"
+                ]
+            },
+            "感冒": {
+                urgency: "low",
+                urgencyText: "症狀治療 🍵",
+                care: [
+                    "保持充分休息，維持規律作息",
+                    "多喝溫開水，補充維生素 C",
+                    "保持護理環境通風良好",
+                    "遵醫囑給予症狀緩解藥物"
+                ],
+                flags: [
+                    "高燒不退持續 > 3 天",
+                    "劇烈咳嗽伴隨濃稠黃綠痰",
+                    "出現胸痛、胸悶症狀"
+                ]
+            },
+            "過敏": {
+                urgency: "low",
+                urgencyText: "避開過敏原 🌸",
+                care: [
+                    "協助詢問並避免接觸過敏原",
+                    "維持病室清潔，減少塵蟎與粉塵",
+                    "遵醫囑給予口服抗組織胺藥物"
+                ],
+                flags: [
+                    "出現喘鳴聲或呼吸困難",
+                    "面部、眼瞼或唇部血管性水腫",
+                    "全身性蕁麻疹迅速蔓延"
+                ]
+            }
+        };
+
+        // 耳溫連動機制：若輸入耳溫 ≥ 37.5°C 則自動勾選發燒
+        function onTempInput() {
+            const tempVal = parseFloat(document.getElementById('temp').value);
+            const feverCb = document.getElementById('fever');
+            if (!isNaN(tempVal) && tempVal >= 37.5) {
+                feverCb.checked = true;
+            } else if (!isNaN(tempVal) && tempVal < 37.5 && feverCb.checked) {
+                feverCb.checked = false;
+            }
+            runInference();
+        }
+
+        function runInference() {
+            const lymph = document.getElementById('lymphNodes').checked;
+            const fever = document.getElementById('fever').checked;
+            const soreThroat = document.getElementById('soreThroat').checked;
+            const congestion = document.getElementById('congestion').checked;
+            const headache = document.getElementById('headache').checked;
+
+            const emptyState = document.getElementById('emptyState');
+            const resultContent = document.getElementById('resultContent');
+
+            document.querySelectorAll('.tree-node, .tree-leaf').forEach(el => el.classList.remove('active'));
+
+            const hasAnySymptom = lymph || fever || soreThroat || congestion || headache;
+
+            if (!hasAnySymptom) {
+                emptyState.style.display = 'block';
+                resultContent.style.display = 'none';
+                document.getElementById('sbarOutput').innerText = "-- 請勾選症狀以生成 SBAR 交接報告 --";
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            resultContent.style.display = 'block';
+
+            let result = "";
+            document.getElementById('nodeRoot').classList.add('active');
+
+            if (lymph) {
+                result = "鏈球菌性喉炎";
+                document.getElementById('leafStrep').classList.add('active');
+            } else {
+                document.getElementById('leafLymphNo').classList.add('active');
+                if (fever) {
+                    result = "感冒";
+                    document.getElementById('leafCold').classList.add('active');
+                } else {
+                    result = "過敏";
+                    document.getElementById('leafAllergy').classList.add('active');
+                }
+            }
+
+            document.getElementById('diagResult').innerText = result;
+
+            const info = CLINICAL_KNOWLEDGE[result];
+            const badge = document.getElementById('urgencyBadge');
+            badge.className = `urgency-badge urgency-${info.urgency}`;
+            badge.innerText = info.urgencyText;
+
+            document.getElementById('careList').innerHTML = info.care.map(i => `<li>${i}</li>`).join('');
+            document.getElementById('flagList').innerHTML = info.flags.map(i => `<li>${i}</li>`).join('');
+
+            updateSBAR(result, {lymph, fever, soreThroat, congestion, headache});
+        }
+
+        function updateSBAR(result, symptoms) {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const mrn = document.getElementById('mrn').value.trim() || '未填寫';
+            const patientName = document.getElementById('patientName').value.trim() || '未填寫';
+            const gender = document.getElementById('gender').value;
+            const ageVal = document.getElementById('age').value.trim();
+            const age = ageVal ? `${ageVal} 歲` : '未填寫';
+            const tempVal = document.getElementById('temp').value.trim();
+            const temp = tempVal ? `${tempVal} °C` : '未測量';
+            const bp = document.getElementById('bp').value.trim() || '未測量';
+            const bedNo = document.getElementById('bedNo').value.trim() || '未填寫';
+            const nurseId = document.getElementById('nurseId').value.trim() || '未填寫';
+
+            const list = [];
+            if (symptoms.soreThroat) list.push("喉嚨痛");
+            if (symptoms.fever) list.push("發燒");
+            if (symptoms.lymphNodes) list.push("淋巴腺腫脹");
+            if (symptoms.congestion) list.push("充血");
+            if (symptoms.headache) list.push("頭痛");
+
+            const situation = list.join("、 ");
+
+            const sbar = `【SBAR 護理交接報告】
+• Situation (情境): 
+  - 病患資訊：${patientName} (${gender}, ${age}) | 病歷號：${mrn} | 床號/病房：${bedNo}
+  - 生命徵象：耳溫 ${temp} | 血壓 ${bp}
+  - 評估時間：${timeStr} | 評估人員：${nurseId}
+  - 主訴與主症狀：${situation}
+
+• Background (背景): 進行 5 項臨床症狀與 Vitals 篩檢，由 C4.5 決策樹模型推論。
+
+• Assessment (評估): C4.5 模型推論結果為「${result}」。
+
+• Recommendation (建議): 遵循「${result}」護理處置，首要執行：${CLINICAL_KNOWLEDGE[result].care[0]}。`;
+
+            document.getElementById('sbarOutput').innerText = sbar;
+        }
+
+        function resetForm() {
+            document.getElementById('mrn').value = '';
+            document.getElementById('patientName').value = '';
+            document.getElementById('gender').value = '女 (Female)';
+            document.getElementById('age').value = '';
+            document.getElementById('temp').value = '';
+            document.getElementById('bp').value = '';
+            document.getElementById('bedNo').value = '';
+            document.getElementById('nurseId').value = '';
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            runInference();
+        }
+
+        function copySBAR() {
+            const text = document.getElementById('sbarOutput').innerText;
+            if (text.includes("--")) {
+                alert("請先選擇症狀生成報告後再進行複製！");
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                alert("🌸 SBAR 護理交接報告已成功複製至剪貼簿！");
+            });
+        }
+
+        runInference();
+    </script>
+</body>
+</html>
